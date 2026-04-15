@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: iln
+    volumes: 
+      - pd:/var/lib/postgresql/data
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+  frontend:
+    build: ./frontend
+    ports:
+      - "3002:80"
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "4440:80"
+    depends_on:
+      - frontend
+      - backend
+volumes:
+  pd:
